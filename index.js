@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import {connectDB} from './db.js';
 import productRoutes from './routes/productRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
@@ -6,6 +7,9 @@ import employeeRoutes from './routes/employeeRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Разрешить все запросы из любого источника
+app.use(cors());
 
 //Middleware для работы с JSON
 app.use(express.json());

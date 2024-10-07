@@ -3,6 +3,7 @@ import cors from 'cors';
 import {connectDB} from './db.js';
 import productRoutes from './routes/productRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
+import newsRoutes from './routes/newsRoutes.js'
 
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use('/api/products', productRoutes)
 app.use('/api/employees', employeeRoutes)
+app.use('/api/news', newsRoutes)
 
 app.get('/', (req, res) => {
     res.send('Backend is running');

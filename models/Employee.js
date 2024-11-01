@@ -5,6 +5,8 @@ const employeeSchema = new mongoose.Schema({
     position: { type: String, required: true },
     contact: { type: String, required: true },
     image: { type: String }, // Ссылка на изображение сотрудника
+    country: { type: String, required: true },
+    region: { type: String, required: true }
 }, {
     timestamps: true,
 });

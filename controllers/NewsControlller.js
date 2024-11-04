@@ -96,6 +96,44 @@ class NewsController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    // Ппросмотры новостей
+    async incrementViews(req, res) {
+        try {
+            const news = await News.findByIdAndUpdate(
+                req.params.id,
+                { $inc: { views: 1 } }, // Увеличиваем поле views на 1
+                { new: true }
+            );
+            if (!news) return res.status(404).json({ message: 'News not found' });
+            res.json(news);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    // Метод для управления количеством лайков
+    async toggleLikes(req, res) {
+        const { action } = req.body; // Получаем действие из тела запроса
+        try {
+            const news = await News.findById(req.params.id);
+            if (!news) return res.status(404).json({ message: 'News not found' });
+
+            if (action === 'increment') {
+                news.likes += 1;
+            } else if (action === 'decrement' && news.likes > 0) {
+                news.likes -= 1;
+            } else {
+                return res.status(400).json({ message: 'Invalid action' });
+            }
+
+            await news.save();
+            res.json({ message: `Likes ${action}ed`, likes: news.likes });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+    
 }
 
 export default new NewsController();

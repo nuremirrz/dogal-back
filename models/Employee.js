@@ -5,10 +5,10 @@ const employeeSchema = new mongoose.Schema({
     position: { type: String, required: true },
     contact: { type: String, required: true },
     image: { type: String }, // Ссылка на изображение сотрудника
-    country: { type: String, required: true },
-    region: { type: String, required: true }
+    countries: [{ type: String, required: true }], // Массив стран, за которые отвечает сотрудник
+    regions: [{ type: String, required: true }],   // Массив областей или регионов    
 }, {
     timestamps: true,
 });
 
-export default mongoose.model('Employee', employeeSchema)
+export default mongoose.model('Employee', employeeSchema);

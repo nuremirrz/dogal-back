@@ -8,5 +8,6 @@ router.post('/', newsController.createNews);
 router.get('/:id', newsController.getOneNews);
 router.put('/:id', newsController.updateNews);
 router.delete('/:id', newsController.deleteNews);
+router.post('/:id/like', newsController.likeNews);
 
 export default router;

@@ -1,5 +1,10 @@
 import Employee from '../models/Employee.js';
 
+// Вспомогательная функция для преобразования первой буквы строки в верхний регистр
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 class EmployeeController {
     // Получение всех сотрудников
     async getAllEmployees(req, res) {
@@ -25,15 +30,14 @@ class EmployeeController {
     // Создание нового сотрудника
     async createEmployee(req, res) {
         try {
-            // Преобразуем JSON-строки в массивы, если они переданы в таком формате
-            const countries = JSON.parse(req.body.countries || '[]');
-            const regions = JSON.parse(req.body.regions || '[]');
+            const countries = req.body.countries || [];
+            const regions = req.body.regions || [];
 
             const employee = new Employee({
                 name: req.body.name,
                 position: req.body.position,
                 contact: req.body.contact,
-                image: req.file ? `../uploads/${req.file.filename}` : '', // Ссылка на изображение, если загружено
+                image: req.body.image || '', // Принимаем URL изображения напрямую
                 countries,
                 regions,
             });
@@ -49,22 +53,17 @@ class EmployeeController {
     // Обновление данных сотрудника
     async updateEmployee(req, res) {
         try {
-            // Преобразуем JSON-строки в массивы, если они переданы в таком формате
-            const countries = JSON.parse(req.body.countries || '[]');
-            const regions = JSON.parse(req.body.regions || '[]');
-            
+            const countries = req.body.countries || [];
+            const regions = req.body.regions || [];
+
             const updateData = {
                 name: req.body.name,
                 position: req.body.position,
                 contact: req.body.contact,
                 countries,
                 regions,
+                image: req.body.image || ''
             };
-
-            // Обновляем поле изображения только если оно присутствует
-            if (req.file) {
-                updateData.image = `../uploads/${req.file.filename}`;
-            }
 
             const employee = await Employee.findByIdAndUpdate(req.params.id, updateData, { new: true });
             if (!employee) return res.status(404).json({ message: 'Employee not found' });
@@ -81,6 +80,40 @@ class EmployeeController {
             const employee = await Employee.findByIdAndDelete(req.params.id);
             if (!employee) return res.status(404).json({ message: 'Employee not found' });
             res.json({ message: 'Employee deleted' });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    // Получение сотрудников по стране и региону
+    async getEmployeesByCountryAndRegion(req, res) {
+        const { country, region } = req.params;
+
+        const normalizedCountry = capitalizeFirstLetter(country);
+
+        const regionNames = {
+            kazakhstan: "Казахстан",
+            russia: "Россия",
+            batken: "Баткенская область",
+            chuy: "Чуйская область",
+            osh: "Ошская область",
+            "issyk-kul": "Иссык-Кульская область",
+            talas: "Таласская область",
+            jalalabad: "Джалал-Абадская область",
+            naryn: "Нарынская область"
+        };
+
+        const normalizedRegion = region ? region.toLowerCase() : null;
+        const fullRegionName = regionNames[normalizedRegion];
+
+        const criteria = { countries: normalizedCountry };
+        if (fullRegionName) {
+            criteria.regions = fullRegionName;
+        }
+
+        try {
+            const employees = await Employee.find(criteria);
+            res.json(employees);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }

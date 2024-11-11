@@ -1,13 +1,15 @@
 import express from 'express';
 import employeeController from '../controllers/EmployeeController.js';
-import upload from '../middlewares/upload.js'
 
 const router = express.Router();
 
 router.get('/', employeeController.getAllEmployees);
-router.post('/', upload.single('image'),  employeeController.createEmployee);
+router.post('/', employeeController.createEmployee);
 router.get('/:id', employeeController.getOneEmployee);
-router.put('/:id', upload.single('image'),  employeeController.updateEmployee);
+router.put('/:id', employeeController.updateEmployee);
 router.delete('/:id', employeeController.deleteEmployee);
+
+//new route for getting Employees by country, regions
+router.get('/country/:country/region/:region?', employeeController.getEmployeesByCountryAndRegion);
 
 export default router;

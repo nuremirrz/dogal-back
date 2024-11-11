@@ -19,8 +19,8 @@ app.use('/api/products', productRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/news', newsRoutes)
 
-// Раздача статических файлов из папки uploads
-app.use('/uploads', express.static('uploads'));
+// // Раздача статических файлов из папки uploads
+// app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.send('Backend is running');

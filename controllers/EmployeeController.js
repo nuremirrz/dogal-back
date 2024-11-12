@@ -1,10 +1,20 @@
 import Employee from '../models/Employee.js';
 
-// Вспомогательная функция для преобразования первой буквы строки в верхний регистр
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
+const countryMap = {
+    kyrgyzstan: "Кыргызстан",
+    kazakhstan: "Казахстан",
+    russia: "Россия",
+};
 
+const regionMap = {
+    batken: "Баткенская область",
+    chuy: "Чуйская область",
+    osh: "Ошская область",
+    "issyk-kul": "Иссык-Кульская область",
+    talas: "Таласская область",
+    jalalabad: "Джалал-Абадская область",
+    naryn: "Нарынская область"
+};
 class EmployeeController {
     // Получение всех сотрудников
     async getAllEmployees(req, res) {
@@ -86,31 +96,49 @@ class EmployeeController {
     }
 
     // Получение сотрудников по стране и региону
+    // async getEmployeesByCountryAndRegion(req, res) {
+    //     const { country, region } = req.params;
+
+    //     // Преобразуем страну и регион из английского в русский формат
+    //     const normalizedCountry = countryMap[country.toLowerCase()];
+    //     const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
+
+    //     // Если страна или регион не найдены в сопоставлении, вернем ошибку
+    //     if (!normalizedCountry || (region && !fullRegionName)) {
+    //         return res.status(400).json({ message: "Некорректная страна или регион" });
+    //     }
+
+    //     // Формируем критерии для поиска в базе данных
+    //     const criteria = { countries: normalizedCountry };
+    //     if (fullRegionName) {
+    //         criteria.regions = fullRegionName;
+    //     }
+
+    //     try {
+    //         const employees = await Employee.find(criteria);
+    //         res.json(employees);
+    //     } catch (error) {
+    //         res.status(500).json({ message: error.message });
+    //     }
+    // }
     async getEmployeesByCountryAndRegion(req, res) {
         const { country, region } = req.params;
-
-        const normalizedCountry = capitalizeFirstLetter(country);
-
-        const regionNames = {
-            kazakhstan: "Казахстан",
-            russia: "Россия",
-            batken: "Баткенская область",
-            chuy: "Чуйская область",
-            osh: "Ошская область",
-            "issyk-kul": "Иссык-Кульская область",
-            talas: "Таласская область",
-            jalalabad: "Джалал-Абадская область",
-            naryn: "Нарынская область"
-        };
-
-        const normalizedRegion = region ? region.toLowerCase() : null;
-        const fullRegionName = regionNames[normalizedRegion];
-
+    
+        // Преобразуем страну и регион из английского в русский формат
+        const normalizedCountry = countryMap[country.toLowerCase()];
+        const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
+    
+        // Если страна не найдена в сопоставлении, вернем ошибку
+        if (!normalizedCountry) {
+            return res.status(400).json({ message: "Некорректная страна" });
+        }
+    
+        // Формируем критерии для поиска в базе данных
         const criteria = { countries: normalizedCountry };
         if (fullRegionName) {
             criteria.regions = fullRegionName;
         }
-
+    
         try {
             const employees = await Employee.find(criteria);
             res.json(employees);
@@ -118,6 +146,8 @@ class EmployeeController {
             res.status(500).json({ message: error.message });
         }
     }
+    
+    
 }
 
 export default new EmployeeController();

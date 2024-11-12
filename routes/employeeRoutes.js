@@ -10,6 +10,7 @@ router.put('/:id', employeeController.updateEmployee);
 router.delete('/:id', employeeController.deleteEmployee);
 
 //new route for getting Employees by country, regions
+router.get('/country/:country', employeeController.getEmployeesByCountryAndRegion);
 router.get('/country/:country/region/:region?', employeeController.getEmployeesByCountryAndRegion);
 
 export default router;

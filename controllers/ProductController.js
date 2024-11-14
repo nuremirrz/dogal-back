@@ -21,9 +21,9 @@ class ProductController {
     }
 
     async createProduct(req, res) {
-        const { name, description, type, dosage, aplicableCrops, activeIngredients, safetyPrecautions, expirationData, category, price, image } = req.body;
+        const { name, description, aplicableCrops, activeIngredients, category, price, image } = req.body;
         try {
-            const product = new Product({ name, description, type, dosage, aplicableCrops, activeIngredients, safetyPrecautions, expirationData, category, price, image });
+            const product = new Product({ name, description, aplicableCrops, activeIngredients, category, price, image });
             await product.save();
             res.status(201).json(product);
         } catch (error) {

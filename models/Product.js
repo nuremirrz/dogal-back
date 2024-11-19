@@ -5,7 +5,7 @@ const Product = new mongoose.Schema({
     description: { type: String, required: true },
     aplicableCrops: [{type: String}],
     activeIngredients: [{type: String}],
-    category: {type: String, enum: ['Гербициды','ПГР', 'Инсектициды', 'Акарициды','Нематициды','Фунгициды','Моллюскоциды','Фумиганты'], required: true },
+    category: {type: String, enum: ['Гербициды','ПГР', 'Инсектициды', 'Удобрения','Акарициды','Нематициды','Фунгициды','Моллюскоциды','Фумиганты'], required: true },
     price: { type: Number, required: true },
     image: { type: String }, 
 }, {

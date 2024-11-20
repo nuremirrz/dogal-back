@@ -1,11 +1,10 @@
 import express from 'express';
-import { subscribe, sendNewsletter } from '../controllers/SubscriberController.js';
+import SubscriberController from '../controllers/SubscriberController.js';
 
 const router = express.Router();
 
-// Маршрут для подписки
-router.post('/subscribe', subscribe);
-// Маршрут для массовой рассылки
-router.post('/send-newsletter', sendNewsletter);
+router.post('/subscribe', SubscriberController.subscribe);
+router.post('/send-newsletter', SubscriberController.sendNewsletter);
+router.get('/all', SubscriberController.getAllSubscribers);
 
 export default router;

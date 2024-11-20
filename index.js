@@ -4,6 +4,8 @@ import {connectDB} from './db.js';
 import productRoutes from './routes/productRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import newsRoutes from './routes/newsRoutes.js'
+import subscriberRoutes from './routes/subscriberRoutes.js';
+
 
 
 const app = express();
@@ -18,6 +20,7 @@ app.use(express.json());
 app.use('/api/products', productRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/news', newsRoutes)
+app.use('/api/subscribers', subscriberRoutes);
 
 // // Раздача статических файлов из папки uploads
 // app.use('/uploads', express.static('uploads'));

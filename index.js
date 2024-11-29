@@ -5,6 +5,7 @@ import productRoutes from './routes/productRoutes.js';
 import employeeRoutes from './routes/employeeRoutes.js';
 import newsRoutes from './routes/newsRoutes.js'
 import subscriberRoutes from './routes/subscriberRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 
 
@@ -21,6 +22,7 @@ app.use('/api/products', productRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/news', newsRoutes)
 app.use('/api/subscribers', subscriberRoutes);
+app.use('/api/admin', adminRoutes)
 
 // // Раздача статических файлов из папки uploads
 // app.use('/uploads', express.static('uploads'));

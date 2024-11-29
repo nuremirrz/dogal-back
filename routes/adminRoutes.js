@@ -5,22 +5,23 @@ const router = express.Router();
 
 const adminUsername = 'admin';
 const adminPassword = 'securepassword';
+const jwtSecret = process.env.JWT_SECRET || 'default_secret_key';
 
 // Маршрут для логина
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  if (username === adminUsername && password === adminPassword) {
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: 'Неверные учетные данные' });
+    if (username === adminUsername && password === adminPassword) {
+      const token = jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
+      res.json({ token });
+    } else {
+      res.status(401).json({ message: 'Неверные учетные данные' });
+    }
+  } catch (error) {
+    console.error('Ошибка:', error);
+    res.status(500).json({ message: 'Внутренняя ошибка сервера' });
   }
-});
-
-// Пример защищенного маршрута
-router.get('/dashboard', (req, res) => {
-  res.json({ message: 'Добро пожаловать в админку!' });
 });
 
 export default router;

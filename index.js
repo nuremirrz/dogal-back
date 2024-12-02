@@ -31,11 +31,6 @@ app.get('/', (req, res) => {
     res.send('Backend is running');
 });
 
-//testing API
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'API работает!' });
-});
-
 async function startApp() {
     try {
         connectDB()

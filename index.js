@@ -24,8 +24,6 @@ app.use('/api/news', newsRoutes)
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/admin', adminRoutes)
 
-// // Раздача статических файлов из папки uploads
-// app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
     res.send('Backend is running');

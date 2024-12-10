@@ -4,6 +4,7 @@ const countryMap = {
     kyrgyzstan: "Кыргызстан",
     kazakhstan: "Казахстан",
     russia: "Россия",
+    uzbekistan: "Узбекистан",
 };
 
 const regionMap = {

@@ -14,8 +14,9 @@ const regionMap = {
     "issyk-kul": "Иссык-Кульская область",
     talas: "Таласская область",
     jalalabad: "Джалал-Абадская область",
-    naryn: "Нарынская область"
+    naryn: "Нарынская область",
 };
+
 class EmployeeController {
     // Получение всех сотрудников
     async getAllEmployees(req, res) {
@@ -23,6 +24,7 @@ class EmployeeController {
             const employees = await Employee.find();
             res.json(employees);
         } catch (error) {
+            console.error('Ошибка при получении всех сотрудников:', error.message);
             res.status(500).json({ message: error.message });
         }
     }
@@ -31,9 +33,12 @@ class EmployeeController {
     async getOneEmployee(req, res) {
         try {
             const employee = await Employee.findById(req.params.id);
-            if (!employee) return res.status(404).json({ message: 'Employee not found' });
+            if (!employee) {
+                return res.status(404).json({ message: 'Сотрудник не найден' });
+            }
             res.json(employee);
         } catch (error) {
+            console.error('Ошибка при получении сотрудника:', error.message);
             res.status(500).json({ message: error.message });
         }
     }
@@ -41,16 +46,20 @@ class EmployeeController {
     // Создание нового сотрудника
     async createEmployee(req, res) {
         try {
-            const countries = req.body.countries || [];
-            const regions = req.body.regions || [];
+            const { name, position, contact, image, countries, regions } = req.body;
+
+            // Проверка обязательных полей
+            if (!name || !position || !contact || !image) {
+                return res.status(400).json({ message: "Все обязательные поля должны быть заполнены" });
+            }
 
             const employee = new Employee({
-                name: req.body.name,
-                position: req.body.position,
-                contact: req.body.contact,
-                image: req.body.image || '', // Принимаем URL изображения напрямую
-                countries,
-                regions,
+                name,
+                position,
+                contact,
+                image, // Ожидается строка Base64
+                countries: countries || [],
+                regions: regions || [],
             });
 
             await employee.save();
@@ -64,20 +73,22 @@ class EmployeeController {
     // Обновление данных сотрудника
     async updateEmployee(req, res) {
         try {
-            const countries = req.body.countries || [];
-            const regions = req.body.regions || [];
+            const { name, position, contact, image, countries, regions } = req.body;
 
+            // Формируем данные для обновления
             const updateData = {
-                name: req.body.name,
-                position: req.body.position,
-                contact: req.body.contact,
-                countries,
-                regions,
-                image: req.body.image || ''
+                name,
+                position,
+                contact,
+                image,
+                countries: countries || [],
+                regions: regions || [],
             };
 
             const employee = await Employee.findByIdAndUpdate(req.params.id, updateData, { new: true });
-            if (!employee) return res.status(404).json({ message: 'Employee not found' });
+            if (!employee) {
+                return res.status(404).json({ message: 'Сотрудник не найден' });
+            }
             res.json(employee);
         } catch (error) {
             console.error('Ошибка при обновлении сотрудника:', error.message);
@@ -89,66 +100,40 @@ class EmployeeController {
     async deleteEmployee(req, res) {
         try {
             const employee = await Employee.findByIdAndDelete(req.params.id);
-            if (!employee) return res.status(404).json({ message: 'Employee not found' });
-            res.json({ message: 'Employee deleted' });
+            if (!employee) {
+                return res.status(404).json({ message: 'Сотрудник не найден' });
+            }
+            res.json({ message: 'Сотрудник удален' });
         } catch (error) {
+            console.error('Ошибка при удалении сотрудника:', error.message);
             res.status(500).json({ message: error.message });
         }
     }
 
     // Получение сотрудников по стране и региону
-    // async getEmployeesByCountryAndRegion(req, res) {
-    //     const { country, region } = req.params;
-
-    //     // Преобразуем страну и регион из английского в русский формат
-    //     const normalizedCountry = countryMap[country.toLowerCase()];
-    //     const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
-
-    //     // Если страна или регион не найдены в сопоставлении, вернем ошибку
-    //     if (!normalizedCountry || (region && !fullRegionName)) {
-    //         return res.status(400).json({ message: "Некорректная страна или регион" });
-    //     }
-
-    //     // Формируем критерии для поиска в базе данных
-    //     const criteria = { countries: normalizedCountry };
-    //     if (fullRegionName) {
-    //         criteria.regions = fullRegionName;
-    //     }
-
-    //     try {
-    //         const employees = await Employee.find(criteria);
-    //         res.json(employees);
-    //     } catch (error) {
-    //         res.status(500).json({ message: error.message });
-    //     }
-    // }
     async getEmployeesByCountryAndRegion(req, res) {
         const { country, region } = req.params;
-    
-        // Преобразуем страну и регион из английского в русский формат
+
         const normalizedCountry = countryMap[country.toLowerCase()];
         const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
-    
-        // Если страна не найдена в сопоставлении, вернем ошибку
+
         if (!normalizedCountry) {
             return res.status(400).json({ message: "Некорректная страна" });
         }
-    
-        // Формируем критерии для поиска в базе данных
+
         const criteria = { countries: normalizedCountry };
         if (fullRegionName) {
             criteria.regions = fullRegionName;
         }
-    
+
         try {
             const employees = await Employee.find(criteria);
             res.json(employees);
         } catch (error) {
+            console.error('Ошибка при получении сотрудников по стране и региону:', error.message);
             res.status(500).json({ message: error.message });
         }
     }
-    
-    
 }
 
 export default new EmployeeController();

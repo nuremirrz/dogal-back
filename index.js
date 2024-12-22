@@ -17,6 +17,9 @@ app.use(cors());
 
 //Middleware для работы с JSON
 app.use(express.json());
+// app.use(express.json({ limit: '10mb' }));
+// app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 
 app.use('/api/products', productRoutes)
 app.use('/api/employees', employeeRoutes)

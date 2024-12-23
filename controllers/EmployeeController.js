@@ -1,4 +1,5 @@
-import Employee from '../models/Employee.js';
+import mongoose from "mongoose";
+import Employee from "../models/Employee.js";
 
 const countryMap = {
     kyrgyzstan: "Кыргызстан",
@@ -18,114 +19,98 @@ const regionMap = {
 };
 
 class EmployeeController {
-    // Получение всех сотрудников
     async getAllEmployees(req, res) {
         try {
             const employees = await Employee.find();
             res.json(employees);
         } catch (error) {
-            console.error('Ошибка при получении всех сотрудников:', error.message);
+            console.error("Ошибка при получении всех сотрудников:", error.message);
             res.status(500).json({ message: error.message });
         }
     }
 
-    // Получение одного сотрудника по ID
     async getOneEmployee(req, res) {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Некорректный ID" });
+        }
         try {
             const employee = await Employee.findById(req.params.id);
             if (!employee) {
-                return res.status(404).json({ message: 'Сотрудник не найден' });
+                return res.status(404).json({ message: "Сотрудник не найден" });
             }
             res.json(employee);
         } catch (error) {
-            console.error('Ошибка при получении сотрудника:', error.message);
+            console.error("Ошибка при получении сотрудника:", error.message);
             res.status(500).json({ message: error.message });
         }
     }
 
-    // Создание нового сотрудника
     async createEmployee(req, res) {
-    try {
-        const { name, position, contact, countries, regions } = req.body;
-        const image = req.file ? `/uploads/${req.file.filename}` : null; // Используем путь, сгенерированный multer
-
-        // Проверка обязательных полей
-        if (!name || !position || !contact || !image) {
-            return res.status(400).json({ message: "Все обязательные поля должны быть заполнены" });
-        }
-
-        const employee = new Employee({
-            name,
-            position,
-            contact,
-            image,
-            countries: countries || [],
-            regions: regions || [],
-        });
-
-        await employee.save();
-        res.status(201).json(employee);
-    } catch (error) {
-        console.error('Ошибка при создании сотрудника:', error.message);
-        res.status(400).json({ message: error.message });
-    }
-}
-
-
-    // Обновление данных сотрудника
-    async updateEmployee(req, res) {
         try {
-            const { name, position, contact, countries, regions } = req.body;
-            const image = req.file ? `/uploads/${req.file.filename}` : undefined; // Если есть новое изображение
-    
-            // Формируем данные для обновления
-            const updateData = {
+            const { name, position, contact, image, countries, regions } = req.body;
+            if (!name || !position || !contact) {
+                return res.status(400).json({ message: "Все обязательные поля должны быть заполнены" });
+            }
+
+            const employee = new Employee({
                 name,
                 position,
                 contact,
+                image,
                 countries: countries || [],
                 regions: regions || [],
-            };
-    
-            if (image) {
-                updateData.image = image; // Обновляем поле только если изображение было передано
-            }
-    
-            const employee = await Employee.findByIdAndUpdate(req.params.id, updateData, { new: true });
-            if (!employee) {
-                return res.status(404).json({ message: 'Сотрудник не найден' });
-            }
-            res.json(employee);
+            });
+
+            await employee.save();
+            res.status(201).json(employee);
         } catch (error) {
-            console.error('Ошибка при обновлении сотрудника:', error.message);
+            console.error("Ошибка при создании сотрудника:", error.message);
             res.status(400).json({ message: error.message });
         }
     }
-    
 
-    // Удаление сотрудника
+    async updateEmployee(req, res) {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Некорректный ID" });
+        }
+        try {
+            const { name, position, contact, image, countries, regions } = req.body;
+            const updateData = { name, position, contact, image, countries, regions };
+
+            const employee = await Employee.findByIdAndUpdate(req.params.id, updateData, { new: true });
+            if (!employee) {
+                return res.status(404).json({ message: "Сотрудник не найден" });
+            }
+            res.json(employee);
+        } catch (error) {
+            console.error("Ошибка при обновлении сотрудника:", error.message);
+            res.status(400).json({ message: error.message });
+        }
+    }
+
     async deleteEmployee(req, res) {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: "Некорректный ID" });
+        }
         try {
             const employee = await Employee.findByIdAndDelete(req.params.id);
             if (!employee) {
-                return res.status(404).json({ message: 'Сотрудник не найден' });
+                return res.status(404).json({ message: "Сотрудник не найден" });
             }
-            res.json({ message: 'Сотрудник удален' });
+            res.json({ message: "Сотрудник удален" });
         } catch (error) {
-            console.error('Ошибка при удалении сотрудника:', error.message);
+            console.error("Ошибка при удалении сотрудника:", error.message);
             res.status(500).json({ message: error.message });
         }
     }
 
-    // Получение сотрудников по стране и региону
     async getEmployeesByCountryAndRegion(req, res) {
         const { country, region } = req.params;
-
-        const normalizedCountry = countryMap[country.toLowerCase()];
+        const normalizedCountry = country ? countryMap[country.toLowerCase()] : null;
         const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
 
         if (!normalizedCountry) {
-            return res.status(400).json({ message: "Некорректная страна" });
+            return res.status(400).json({ message: "Некорректная или отсутствующая страна" });
         }
 
         const criteria = { countries: normalizedCountry };
@@ -137,7 +122,7 @@ class EmployeeController {
             const employees = await Employee.find(criteria);
             res.json(employees);
         } catch (error) {
-            console.error('Ошибка при получении сотрудников по стране и региону:', error.message);
+            console.error("Ошибка при получении сотрудников по стране и региону:", error.message);
             res.status(500).json({ message: error.message });
         }
     }

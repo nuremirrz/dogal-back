@@ -45,46 +45,52 @@ class EmployeeController {
 
     // Создание нового сотрудника
     async createEmployee(req, res) {
-        try {
-            const { name, position, contact, image, countries, regions } = req.body;
+    try {
+        const { name, position, contact, countries, regions } = req.body;
+        const image = req.file ? `/uploads/${req.file.filename}` : null; // Используем путь, сгенерированный multer
 
-            // Проверка обязательных полей
-            if (!name || !position || !contact || !image) {
-                return res.status(400).json({ message: "Все обязательные поля должны быть заполнены" });
-            }
-
-            const employee = new Employee({
-                name,
-                position,
-                contact,
-                image, // Ожидается строка Base64
-                countries: countries || [],
-                regions: regions || [],
-            });
-
-            await employee.save();
-            res.status(201).json(employee);
-        } catch (error) {
-            console.error('Ошибка при создании сотрудника:', error.message);
-            res.status(400).json({ message: error.message });
+        // Проверка обязательных полей
+        if (!name || !position || !contact || !image) {
+            return res.status(400).json({ message: "Все обязательные поля должны быть заполнены" });
         }
+
+        const employee = new Employee({
+            name,
+            position,
+            contact,
+            image,
+            countries: countries || [],
+            regions: regions || [],
+        });
+
+        await employee.save();
+        res.status(201).json(employee);
+    } catch (error) {
+        console.error('Ошибка при создании сотрудника:', error.message);
+        res.status(400).json({ message: error.message });
     }
+}
+
 
     // Обновление данных сотрудника
     async updateEmployee(req, res) {
         try {
-            const { name, position, contact, image, countries, regions } = req.body;
-
+            const { name, position, contact, countries, regions } = req.body;
+            const image = req.file ? `/uploads/${req.file.filename}` : undefined; // Если есть новое изображение
+    
             // Формируем данные для обновления
             const updateData = {
                 name,
                 position,
                 contact,
-                image,
                 countries: countries || [],
                 regions: regions || [],
             };
-
+    
+            if (image) {
+                updateData.image = image; // Обновляем поле только если изображение было передано
+            }
+    
             const employee = await Employee.findByIdAndUpdate(req.params.id, updateData, { new: true });
             if (!employee) {
                 return res.status(404).json({ message: 'Сотрудник не найден' });
@@ -95,6 +101,7 @@ class EmployeeController {
             res.status(400).json({ message: error.message });
         }
     }
+    
 
     // Удаление сотрудника
     async deleteEmployee(req, res) {

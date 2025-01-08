@@ -4,8 +4,8 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Используем Gmail (можно заменить на другой сервис)
     auth: {
-        user: 'erzetq9lol@gmail.com', // Твой email
-        pass: 'ettz zljx lelp yhsk',   // App Password (не обычный пароль, см. ниже)
+        user: 'infodogaltrm23092017@gmail.com', // Твой email
+        pass: 'cdjx cccu yvnq pusa',   // App Password (не обычный пароль, см. ниже)
     },
 });
 
@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 export const sendEmail = async (recipient, subject, text) => {
     try {
         const mailOptions = {
-            from: 'erzetq9lol@gmail.com',
+            from: 'Догал Агрохимикаты и Пестициды <infodogaltrm23092017@gmail.com>',
             to: recipient,
             subject: subject,
             text: text,

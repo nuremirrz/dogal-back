@@ -3,13 +3,16 @@ import News from '../models/News.js';
 class NewsController {
     // Получить все новости
     async getAllNews(req, res) {
+        const { showAll } = req.query; // Параметр showAll=true передаётся из запроса
         try {
-            const allNews = await News.find();
+            const query = showAll === 'true' ? {} : { published: true }; // Если showAll=true, не фильтруем
+            const allNews = await News.find(query);
             res.json(allNews);
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
+    
 
     // Получить одну новость
     async getOneNews(req, res) {

@@ -5,7 +5,7 @@ const router = express.Router();
 
 //new route for getting Employees by country, regions
 router.get('/country/:country', employeeController.getEmployeesByCountryAndRegion);
-router.get('/country/:country/region/:region?', employeeController.getEmployeesByCountryAndRegion);
+router.get('/country/:country/region/:region', employeeController.getEmployeesByCountryAndRegion);
 
 router.get('/', employeeController.getAllEmployees);
 router.post('/', employeeController.createEmployee);

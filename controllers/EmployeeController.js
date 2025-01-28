@@ -103,29 +103,43 @@ class EmployeeController {
             res.status(500).json({ message: error.message });
         }
     }
-
+    
     async getEmployeesByCountryAndRegion(req, res) {
         const { country, region } = req.params;
-        const normalizedCountry = country ? countryMap[country.toLowerCase()] : null;
-        const fullRegionName = region ? regionMap[region.toLowerCase()] : null;
-
+    
+        const normalizedCountry = country ? countryMap[country.trim().toLowerCase()] : null;
+        const fullRegionName = region ? regionMap[region.trim().toLowerCase()] : null;
+    
         if (!normalizedCountry) {
-            return res.status(400).json({ message: "Некорректная или отсутствующая страна" });
+            return res.status(400).json({ message: "Некорректная или отсутствующая страна." });
         }
-
+    
+        if (region && !fullRegionName) {
+            return res.status(400).json({ message: `Некорректный регион: ${region}.` });
+        }
+    
         const criteria = { countries: normalizedCountry };
-        if (fullRegionName) {
-            criteria.regions = fullRegionName;
+        if (region && fullRegionName) {
+            criteria.regions = fullRegionName; // Точное совпадение вместо $in
         }
-
+        console.log("Filtering criteria:", criteria);
+        
+    
         try {
             const employees = await Employee.find(criteria);
+            if (employees.length === 0) {
+                return res.status(404).json({ 
+                    message: "Сотрудники не найдены для указанных параметров.",
+                    country: normalizedCountry,
+                    region: fullRegionName || "не указан"
+                });
+            }
             res.json(employees);
         } catch (error) {
             console.error("Ошибка при получении сотрудников по стране и региону:", error.message);
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ message: "Внутренняя ошибка сервера.", details: error.message });
         }
-    }
+    }    
 }
 
 export default new EmployeeController();

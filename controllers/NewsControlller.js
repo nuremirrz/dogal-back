@@ -33,47 +33,56 @@ class NewsController {
     // Создать новость
     async createNews(req, res) {
         const { title, content, image, category, tags, published } = req.body;
+
+        // Разделяем теги по запятой и удаляем пробелы
+        const tagsArray = tags ? tags.split(',').map(tag => tag.trim()) : [];
+    
+        const publishedAt = published ? new Date() : null;
+    
         try {
-            const publishedAt = published ? new Date() : null;
             const news = new News({
                 title,
                 content,
                 image,
                 category,
-                tags,
+                tags: tagsArray, // Сохраняем массив тегов
                 published,
                 publishedAt
             });
+    
             await news.save();
             res.status(201).json(news);
         } catch (error) {
             res.status(400).json({ message: error.message });
         }
     }
+    
 
     // Обновить новость
     async updateNews(req, res) {
-        const { title, content, image, category, tags, published } = req.body;
-        try {
-            const news = await News.findById(req.params.id);
-            if (!news) return res.status(404).json({ message: 'Selected News not found' });
+    const { title, content, image, category, tags, published } = req.body;
 
-            // Обновляем поля
-            news.title = title || news.title;
-            news.content = content || news.content;
-            news.image = image || news.image;
-            news.category = category || news.category;
-            news.tags = tags || news.tags;
-            news.published = published !== undefined ? published : news.published;
-            news.publishedAt = published ? news.publishedAt || new Date() : null;
-            news.lastModified = new Date();
+    try {
+        const news = await News.findById(req.params.id);
+        if (!news) return res.status(404).json({ message: 'Selected News not found' });
 
-            await news.save();
-            res.json(news);
-        } catch (error) {
-            res.status(400).json({ message: error.message });
-        }
+        // Обновляем поля
+        news.title = title || news.title;
+        news.content = content || news.content;
+        news.image = image || news.image;
+        news.category = category || news.category;
+        news.tags = tags ? tags.split(',').map(tag => tag.trim()) : news.tags;
+        news.published = published !== undefined ? published : news.published;
+        news.publishedAt = published ? news.publishedAt || new Date() : null;
+        news.lastModified = new Date();
+
+        await news.save();
+        res.json(news);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
+}
+
 
     // Удалить новость
     async deleteNews(req, res) {

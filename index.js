@@ -39,14 +39,15 @@ app.get('*', (req, res) => {
 // Запуск сервера
 async function startApp() {
     try {
-        connectDB(); // Подключение к базе данных
+        await connectDB(); // Ждём подключения к базе
         app.listen(PORT, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
     } catch (error) {
-        console.error(error.message);
-        process.exit(1);
+        console.error('Ошибка подключения к базе:', error.message);
+        process.exit(1); // Завершаем процесс при ошибке
     }
 }
+
 
 startApp();

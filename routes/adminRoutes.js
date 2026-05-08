@@ -28,7 +28,7 @@ const parseExpiresInToMs = (value) => {
 const authCookieOptions = {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'strict',
+    sameSite: isProd ? 'none' : 'lax',
     path: '/',
     maxAge: parseExpiresInToMs(jwtExpiresIn),
 };

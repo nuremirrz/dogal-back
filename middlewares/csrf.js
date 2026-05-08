@@ -16,7 +16,7 @@ const {
     getSessionIdentifier: (req) => req.user?.sub || '',
     cookieName: isProd ? '__Host-csrf-token' : 'csrf-token',
     cookieOptions: {
-        sameSite: 'strict',
+        sameSite: isProd ? 'none' : 'lax',
         secure: isProd,
         httpOnly: true,
         path: '/',

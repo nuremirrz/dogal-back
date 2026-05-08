@@ -9,19 +9,23 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+const FROM_NAME = process.env.EMAIL_FROM_NAME || 'Догал Агрохимикаты и Пестициды';
+
 // Функция отправки email
 export const sendEmail = async (recipient, subject, text) => {
-    try {
-        const mailOptions = {
-            from: 'Догал Агрохимикаты и Пестициды <infodogaltrm23092017@gmail.com>',
-            to: recipient,
-            subject: subject,
-            text: text,
-        };
-
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`Email отправлен: ${info.response}`);
-    } catch (error) {
-        console.error('Ошибка при отправке письма:', error);
+    const fromAddress = process.env.EMAIL_USER;
+    if (!fromAddress) {
+        throw new Error('EMAIL_USER is not configured');
     }
+
+    const mailOptions = {
+        from: `${FROM_NAME} <${fromAddress}>`,
+        to: recipient,
+        subject: subject,
+        text: text,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`Email отправлен: ${info.response}`);
+    return info;
 };

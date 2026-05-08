@@ -1,7 +1,6 @@
 import express from 'express';
 import employeeController from '../controllers/EmployeeController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
-import { doubleCsrfProtection } from '../middlewares/csrf.js';
 
 const router = express.Router();
 
@@ -11,8 +10,8 @@ router.get('/country/:country/region/:region', employeeController.getEmployeesBy
 router.get('/', employeeController.getAllEmployees);
 router.get('/:id', employeeController.getOneEmployee);
 
-router.post('/', authMiddleware, doubleCsrfProtection, employeeController.createEmployee);
-router.put('/:id', authMiddleware, doubleCsrfProtection, employeeController.updateEmployee);
-router.delete('/:id', authMiddleware, doubleCsrfProtection, employeeController.deleteEmployee);
+router.post('/', authMiddleware, employeeController.createEmployee);
+router.put('/:id', authMiddleware, employeeController.updateEmployee);
+router.delete('/:id', authMiddleware, employeeController.deleteEmployee);
 
 export default router;
